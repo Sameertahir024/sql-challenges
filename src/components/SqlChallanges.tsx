@@ -78,40 +78,21 @@ const SqlChallanges = ({ Challenge }: { Challenge: SQLQuestion }) => {
                 <span>Challenge #{Challenge.id}</span>
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleShowHint}
-                    >
-                      <HelpCircle className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Show Hint</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            <div className="flex items-center justify-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleShowHint}>
+                <HelpCircle className="h-4 w-4" />
+                <span>show Hint</span>
+              </Button>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleShowSolution}
-                    >
-                      <Info className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Show Solution</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center justify-center gap-2"
+                onClick={handleShowSolution}
+              >
+                <Info className="h-4 w-4" />
+                <span>Show Solution</span>
+              </Button>
             </div>
           </div>
         </CardHeader>
