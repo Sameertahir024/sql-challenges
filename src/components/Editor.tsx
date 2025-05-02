@@ -37,7 +37,7 @@ const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
             name="sql-editor"
             onChange={(value) => UserQuery(value)}
             fontSize={20}
-            width="50%"
+            width="100%"
             height={"300px"}
             value={quary}
             editorProps={{ $blockScrolling: true }}
