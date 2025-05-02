@@ -46,12 +46,12 @@ const SqlChallanges = ({ Challenge }: { Challenge: SQLQuestion }) => {
   const [showSolution, setShowSolution] = useState(false);
   const handleShowHint = () => {
     setShowHint(true);
-    toast.info("Hint revealed!");
+    toast.success("Hint revealed!");
   };
 
   const handleShowSolution = () => {
     setShowSolution(true);
-    toast.info("Solution revealed!");
+    toast.success("Solution revealed!");
   };
   return (
     <div className="space-y-6">
