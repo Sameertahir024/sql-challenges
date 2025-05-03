@@ -9,12 +9,7 @@ import {
 } from "./ui/card";
 import { Button } from "./ui/button";
 import { AlertCircle, Check, HelpCircle, Info } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+
 import Editor from "./Editor";
 import TableView from "./TableView";
 import { toast } from "sonner";
