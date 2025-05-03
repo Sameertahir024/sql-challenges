@@ -31,3 +31,86 @@ enum Difficulty {
   medium
   hard
 }
+
+model Customer {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String?
+  orders    Order[]
+  Review    Review[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  Supplier    Supplier?   @relation(fields: [supplierId], references: [id])
+  supplierId  Int?
+  Review      Review[]
+  Inventory   Inventory[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  customerId Int
+  customer   Customer    @relation(fields: [customerId], references: [id])
+  orderDate  DateTime    @default(now())
+  status     String
+  orderItems OrderItem[]
+  payments   Payment[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id      Int       @id @default(autoincrement())
+  orderId Int
+  amount  Float
+  status  String
+  paidAt  DateTime?
+  order   Order     @relation(fields: [orderId], references: [id])
+}
+
+model Supplier {
+  id          Int       @id @default(autoincrement())
+  name        String
+  contactInfo String?
+  products    Product[]
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  customerId Int
+  rating     Int
+  comment    String?
+  product    Product  @relation(fields: [productId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id])
+}
+
+model Inventory {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  quantity  Int
+  product   Product @relation(fields: [productId], references: [id])
+}
