@@ -8,109 +8,61 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Challenge {
-  id             Int        @id @default(autoincrement())
-  title          String
-  description    String
-  difficulty     Difficulty
-  hint           String
-  sampleSolution String
-  createdAt      DateTime   @default(now())
-  answers        Answer[]
+model challenge {
+  id              Int        @id @default(autoincrement())
+  title           String
+  description     String
+  difficulty      difficulty
+  hint            String
+  sample_solution String
+  created_at      DateTime   @default(now())
+  answers         answer[]
 }
 
-model Answer {
-  id          Int       @id @default(autoincrement())
-  challenge   Challenge @relation(fields: [challengeId], references: [id])
-  challengeId Int
-  resultJson  Json
+model answer {
+  id           Int       @id @default(autoincrement())
+  challenge_id Int
+  result_json  Json
+  challenge    challenge @relation(fields: [challenge_id], references: [id])
 }
 
-enum Difficulty {
+enum difficulty {
   easy
   medium
   hard
 }
 
-model Customer {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  phone     String?
-  orders    Order[]
-  Review    Review[]
+model student {
+  id              Int            @id @default(autoincrement())
+  first_name      String
+  last_name       String
+  email           String         @unique
+  gender          String
+  date_of_birth   DateTime
+  enrollment_year Int
+  major           String
+  gpa             Float
+  registrations   registration[]
 }
 
-model Product {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  categoryId  Int
-  category    Category    @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  Supplier    Supplier?   @relation(fields: [supplierId], references: [id])
-  supplierId  Int?
-  Review      Review[]
-  Inventory   Inventory[]
+model course {
+  id            Int            @id @default(autoincrement())
+  course_code   String         @unique
+  title         String
+  department    String
+  credits       Int
+  semester      String
+  instructor    String
+  registrations registration[]
 }
 
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  products Product[]
-}
-
-model Order {
-  id         Int         @id @default(autoincrement())
-  customerId Int
-  customer   Customer    @relation(fields: [customerId], references: [id])
-  orderDate  DateTime    @default(now())
-  status     String
-  orderItems OrderItem[]
-  payments   Payment[]
-}
-
-model OrderItem {
-  id        Int     @id @default(autoincrement())
-  orderId   Int
-  productId Int
-  quantity  Int
-  price     Float
-  order     Order   @relation(fields: [orderId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
-}
-
-model Payment {
-  id      Int       @id @default(autoincrement())
-  orderId Int
-  amount  Float
-  status  String
-  paidAt  DateTime?
-  order   Order     @relation(fields: [orderId], references: [id])
-}
-
-model Supplier {
-  id          Int       @id @default(autoincrement())
-  name        String
-  contactInfo String?
-  products    Product[]
-}
-
-model Review {
-  id         Int      @id @default(autoincrement())
-  productId  Int
-  customerId Int
-  rating     Int
-  comment    String?
-  product    Product  @relation(fields: [productId], references: [id])
-  customer   Customer @relation(fields: [customerId], references: [id])
-}
-
-model Inventory {
-  id        Int     @id @default(autoincrement())
-  productId Int
-  quantity  Int
-  product   Product @relation(fields: [productId], references: [id])
+model registration {
+  id                Int      @id @default(autoincrement())
+  student_id        Int
+  course_id         Int
+  grade             Float? // Nullable: course in progress
+  registered_at     DateTime @default(now())
+  completion_status String // e.g., 'in_progress', 'completed', 'dropped'
+  student           student  @relation(fields: [student_id], references: [id])
+  course            course   @relation(fields: [course_id], references: [id])
 }
