@@ -8,15 +8,27 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model user {
+  id                Int         @id @default(autoincrement())
+  email             String      @unique
+  name              String
+  total_solve       String
+  image             String?
+  created_at        DateTime    @default(now())
+  progress          progress[]
+  last_challenge_id Int?
+  difficulty        difficulty?
+}
+
 model challenge {
-  id              Int        @id @default(autoincrement())
-  title           String
-  description     String
-  difficulty      difficulty
-  hint            String
-  sample_solution String
-  created_at      DateTime   @default(now())
-  answers         answer[]
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String
+  difficulty  difficulty
+  hint        String
+  created_at  DateTime   @default(now())
+  answers     answer[]
+  progress    progress[]
 }
 
 model answer {
@@ -24,6 +36,23 @@ model answer {
   challenge_id Int
   result_json  Json
   challenge    challenge @relation(fields: [challenge_id], references: [id])
+}
+
+model progress {
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  challenge_id Int
+  status       status
+  updated_at   DateTime  @updatedAt
+  user         user      @relation(fields: [user_id], references: [id])
+  challenge    challenge @relation(fields: [challenge_id], references: [id])
+
+  @@unique([user_id, challenge_id])
+}
+
+enum status {
+  solved
+  skipped
 }
 
 enum difficulty {
