@@ -7,7 +7,7 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import { Button } from "./ui/button";
 import { format } from "@sqltools/formatter";
 
-const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
+const Editor = () => {
   const [query, setQuery] = useState("");
 
   const HandleFormat = () => {
@@ -19,7 +19,6 @@ const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
 
   const handleChange = (value: string) => {
     setQuery(value);
-    UserQuery(value);
   };
 
   return (
