@@ -8,13 +8,20 @@ import { Button } from "./ui/button";
 import { format } from "@sqltools/formatter";
 
 const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
-  const [quary, setQuary] = useState("");
+  const [query, setQuery] = useState("");
+
   const HandleFormat = () => {
-    const formatQuary = format("", {
+    const formattedQuery = format(query, {
       language: "sql",
     });
-    setQuary(formatQuary);
+    setQuery(formattedQuery);
   };
+
+  const handleChange = (value: string) => {
+    setQuery(value);
+    UserQuery(value);
+  };
+
   return (
     <div>
       <div className="rounded-md border bg-card text-card-foreground shadow-sm w-full">
@@ -35,11 +42,11 @@ const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
             mode="sql"
             theme="twilight"
             name="sql-editor"
-            onChange={(value) => UserQuery(value)}
+            onChange={handleChange}
             fontSize={20}
             width="100%"
             height={"300px"}
-            value={quary}
+            value={query}
             editorProps={{ $blockScrolling: true }}
             setOptions={{
               enableBasicAutocompletion: true,
@@ -52,7 +59,6 @@ const Editor = ({ UserQuery }: { UserQuery: (value: string) => void }) => {
             className="ace-editor rounded-b-md"
           />
         </div>
-        <h1>{quary}</h1>
       </div>
     </div>
   );
