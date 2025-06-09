@@ -56,6 +56,7 @@ const SqlChallanges = ({ Challenge }: { Challenge: SQLQuestion }) => {
             <div>
               <CardTitle className="text-2xl font-bold">
                 {Challenge.title}
+                {userQuery}
               </CardTitle>
               <CardDescription className="mt-2 flex items-center gap-2">
                 {/* <span
