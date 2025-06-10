@@ -13,6 +13,15 @@ export default function Header() {
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <ToggleTheme />
+            <Link href="/dashboard">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-sm px-4 sm:px-8"
+              >
+                Dashboard
+              </Button>
+            </Link>
             <Link href="/login">
               <Button
                 variant="outline"
