@@ -62,7 +62,7 @@ export default function LoginPage() {
         className="border p-2 m-2"
       />
       <button onClick={handleLogin} className="bg-blue-500 text-white p-2 m-2">
-        Login / Signup with Email
+        Login with Email
       </button>
       <button
         onClick={() => loginWithProvider("google")}
