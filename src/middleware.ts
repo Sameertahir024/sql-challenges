@@ -1,60 +1,79 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
+  try {
+    // Create a response object that we can modify
+    const response = NextResponse.next();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+    // Create a Supabase client using the server-side method
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get: (name) => request.cookies.get(name)?.value,
+          set: (name, value, options) => {
+            response.cookies.set({
+              name,
+              value,
+              ...options,
+            });
+          },
+          remove: (name, options) => {
+            response.cookies.set({
+              name,
+              value: "",
+              ...options,
+            });
+          },
         },
-        set(name: string, value: string, options: { path: string }) {
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-        },
-        remove(name: string, options: { path: string }) {
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
-        },
-      },
+      }
+    );
+
+    // Refresh the session if needed
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    // Define protected routes
+    const protectedRoutes = ["/dashboard", "/profile", "/settings"];
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      request.nextUrl.pathname.startsWith(route)
+    );
+
+    // Redirect to login if accessing protected route without session
+    if (isProtectedRoute && !session) {
+      return NextResponse.redirect(new URL("/login", request.url));
     }
-  );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    // Redirect to dashboard if accessing auth pages while logged in
+    const authRoutes = ["/login", "/register"];
+    const isAuthRoute = authRoutes.some((route) =>
+      request.nextUrl.pathname.startsWith(route)
+    );
 
-  // If user is not signed in and trying to access protected routes
-  if (!user && !request.nextUrl.pathname.startsWith("/login")) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    return NextResponse.redirect(redirectUrl);
+    if (isAuthRoute && session) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    return response;
+  } catch (e) {
+    console.error("Middleware error:", e);
+    return NextResponse.next();
   }
-
-  // If user is signed in and trying to access login page
-  if (user && request.nextUrl.pathname.startsWith("/login")) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  return response;
 }
 
+// Configure which routes use this middleware
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|public/).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };

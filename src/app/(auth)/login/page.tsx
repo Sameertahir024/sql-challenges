@@ -10,72 +10,122 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    // Try to sign in
-    const { error: loginError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      setIsLoading(true);
+      console.log("Attempting login...");
 
-    if (!loginError) {
-      router.push("/dashboard");
-    } else if (loginError.message === "Invalid login credentials") {
-      // If login fails due to no user, try to sign up
-      const { error: signupError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      // Try to sign in
+      const { data, error: loginError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (signupError) {
-        alert(`Signup failed: ${signupError.message}`);
-      } else {
-        alert("Signup successful! Check your email to confirm.");
-        // Optionally: auto-login user after signup
-        const { error: loginAfterSignupError } =
-          await supabase.auth.signInWithPassword({ email, password });
-        if (!loginAfterSignupError) {
-          router.push("/dashboard");
+      console.log("Login response:", { data, error: loginError });
+
+      if (!loginError) {
+        console.log("Login successful, redirecting to dashboard...");
+        router.push("/dashboard");
+      } else if (loginError.message === "Invalid login credentials") {
+        console.log("Login failed, attempting signup...");
+        // If login fails due to no user, try to sign up
+        const { data: signupData, error: signupError } =
+          await supabase.auth.signUp({
+            email,
+            password,
+          });
+
+        console.log("Signup response:", {
+          data: signupData,
+          error: signupError,
+        });
+
+        if (signupError) {
+          alert(`Signup failed: ${signupError.message}`);
+        } else {
+          alert("Signup successful! Check your email to confirm.");
+          // Optionally: auto-login user after signup
+          const { error: loginAfterSignupError } =
+            await supabase.auth.signInWithPassword({ email, password });
+          if (!loginAfterSignupError) {
+            router.push("/dashboard");
+          }
         }
+      } else {
+        alert(`Login failed: ${loginError.message}`);
       }
-    } else {
-      alert(`Login failed: ${loginError.message}`);
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const loginWithProvider = async (provider: "google" | "github") => {
-    await supabase.auth.signInWithOAuth({ provider });
+    try {
+      setIsLoading(true);
+      console.log(`Attempting ${provider} login...`);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      console.log(`${provider} login response:`, { data, error });
+      if (error) throw error;
+    } catch (error) {
+      console.error(`${provider} login error:`, error);
+      alert(`Failed to login with ${provider}. Please try again.`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div>
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 m-2"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 m-2"
-      />
-      <button onClick={handleLogin} className="bg-blue-500 text-white p-2 m-2">
-        Login with Email
-      </button>
-      <button
-        onClick={() => loginWithProvider("google")}
-        className="bg-red-500 text-white p-2 m-2"
-      >
-        Google
-      </button>
-      <button
-        onClick={() => loginWithProvider("github")}
-        className="bg-gray-800 text-white p-2 m-2"
-      >
-        GitHub
-      </button>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <div className="w-full max-w-md space-y-4">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full border p-2 rounded"
+          disabled={isLoading}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border p-2 rounded"
+          disabled={isLoading}
+        />
+        <button
+          onClick={handleLogin}
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Login with Email"}
+        </button>
+        <button
+          onClick={() => loginWithProvider("google")}
+          className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 disabled:opacity-50"
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Login with Google"}
+        </button>
+        <button
+          onClick={() => loginWithProvider("github")}
+          className="w-full bg-gray-800 text-white p-2 rounded hover:bg-gray-900 disabled:opacity-50"
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Login with GitHub"}
+        </button>
+      </div>
     </div>
   );
 }
