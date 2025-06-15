@@ -13,6 +13,7 @@ import { AlertCircle, Check, HelpCircle, Info } from "lucide-react";
 import Editor from "./Editor";
 import TableView from "./TableView";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface SQLColumn {
   name: string;
@@ -50,7 +51,16 @@ const SqlChallanges = ({ Challenge }: { Challenge: SQLQuestion }) => {
   };
   return (
     <div className="space-y-6">
-      <Card>
+      <div className=" flex gap-3">
+
+        <Link href="/about">about</Link>
+        <Link href="/chahhagama">chahhagama</Link>
+        <Link href="/hajitahir">hajitahir</Link>
+        <Link href="/sameer">sameer</Link>
+        <Link href="/usama">usama</Link>
+        <Link href="/teams">teams</Link>
+      </div>
+        <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

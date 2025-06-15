@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/browserClient";
 import { useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -64,6 +65,8 @@ export default function DashboardPage() {
 
       <div className="grid gap-4">
         {/* User Information Card */}
+        <Link href="/dashboard/overview">overview</Link>
+        <Link href="/dashboard/settings">settings</Link>
         <div className="shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4">User Information</h2>
           <div className="space-y-2">
